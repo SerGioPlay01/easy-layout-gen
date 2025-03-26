@@ -1,3 +1,16 @@
+import React from 'react';
+import {
+  TwelveSpanGridPreview,
+  ThreeByThreeGridPreview,
+  HolyGrailPreview,
+  SidebarPreview,
+  HeaderMainFooterPreview,
+  RowPreview,
+  RowWrapPreview,
+  FillSpacePreview,
+  FillRemainingSpacePreview,
+  SeparatePreview
+} from '../components/LayoutPreviews';
 
 export interface LayoutTemplate {
   id: string;
@@ -348,62 +361,35 @@ export const layoutTemplates: LayoutTemplate[] = [
     name: '12 Span Grid',
     type: 'grid',
     description: 'A responsive 12-column grid system',
-    previewComponent: <div className="grid grid-cols-12 gap-1 w-full h-full">
-      <div className="col-span-12 bg-charcoal-800 h-6"></div>
-      <div className="col-span-6 bg-charcoal-800 h-6"></div>
-      <div className="col-span-4 bg-charcoal-800 h-6"></div>
-      <div className="col-span-2 bg-charcoal-800 h-3"></div>
-    </div>
+    previewComponent: <TwelveSpanGridPreview />
   },
   {
     id: '3x3',
     name: '3 × 3',
     type: 'grid',
     description: 'A simple 3×3 grid layout',
-    previewComponent: <div className="grid grid-cols-3 grid-rows-3 gap-1 w-full h-full">
-      {Array(9).fill(0).map((_, i) => (
-        <div key={i} className="bg-charcoal-800"></div>
-      ))}
-    </div>
+    previewComponent: <ThreeByThreeGridPreview />
   },
   {
     id: 'holy-grail',
     name: 'Holy Grail',
     type: 'grid',
     description: 'Classic header, footer, nav, main, sidebar layout',
-    previewComponent: <div className="grid w-full h-full" style={{
-      gridTemplateAreas: '"header header header" "nav content sidebar" "footer footer footer"',
-      gridTemplateRows: '15% 1fr 15%',
-      gridTemplateColumns: '20% 1fr 20%',
-      gap: '2px'
-    }}>
-      <div style={{ gridArea: 'header' }} className="bg-charcoal-800"></div>
-      <div style={{ gridArea: 'nav' }} className="bg-charcoal-800"></div>
-      <div style={{ gridArea: 'content' }} className="bg-charcoal-800"></div>
-      <div style={{ gridArea: 'sidebar' }} className="bg-charcoal-800"></div>
-      <div style={{ gridArea: 'footer' }} className="bg-charcoal-800"></div>
-    </div>
+    previewComponent: <HolyGrailPreview />
   },
   {
     id: 'sidebar',
     name: 'Sidebar',
     type: 'grid',
     description: 'Simple sidebar and main content layout',
-    previewComponent: <div className="grid grid-cols-[30%_1fr] w-full h-full gap-1">
-      <div className="bg-charcoal-800 h-full"></div>
-      <div className="bg-charcoal-800 h-full"></div>
-    </div>
+    previewComponent: <SidebarPreview />
   },
   {
     id: 'header-main-footer',
     name: 'Header Main Footer',
     type: 'grid',
     description: 'Standard page layout with header and footer',
-    previewComponent: <div className="grid grid-rows-[20%_1fr_20%] w-full h-full gap-1">
-      <div className="bg-charcoal-800"></div>
-      <div className="bg-charcoal-800"></div>
-      <div className="bg-charcoal-800"></div>
-    </div>
+    previewComponent: <HeaderMainFooterPreview />
   },
   
   // Flexbox layouts
@@ -412,56 +398,34 @@ export const layoutTemplates: LayoutTemplate[] = [
     name: 'Row',
     type: 'flexbox',
     description: 'Simple flexbox row layout',
-    previewComponent: <div className="flex gap-1 w-full h-full items-center">
-      <div className="bg-charcoal-800 h-16 w-16 flex-shrink-0"></div>
-      <div className="bg-charcoal-800 h-16 w-16 flex-shrink-0"></div>
-      <div className="bg-charcoal-800 h-16 w-16 flex-shrink-0"></div>
-    </div>
+    previewComponent: <RowPreview />
   },
   {
     id: 'row-wrap',
     name: 'Row Wrap',
     type: 'flexbox',
     description: 'Flexbox row that wraps items to new lines',
-    previewComponent: <div className="flex flex-wrap gap-1 w-full h-full">
-      {Array(7).fill(0).map((_, i) => (
-        <div key={i} className="bg-charcoal-800 h-8 w-8"></div>
-      ))}
-    </div>
+    previewComponent: <RowWrapPreview />
   },
   {
     id: 'fill-space',
     name: 'Fill Space',
     type: 'flexbox',
     description: 'Items that equally distribute available space',
-    previewComponent: <div className="flex gap-1 w-full h-full items-center">
-      <div className="bg-charcoal-800 h-12 flex-1"></div>
-      <div className="bg-charcoal-800 h-12 flex-1"></div>
-      <div className="bg-charcoal-800 h-12 flex-1"></div>
-    </div>
+    previewComponent: <FillSpacePreview />
   },
   {
     id: 'fill-remaining-space',
     name: 'Fill Remaining Space',
     type: 'flexbox',
     description: 'One item fills all remaining space',
-    previewComponent: <div className="flex gap-1 w-full h-full items-center">
-      <div className="bg-charcoal-800 h-12 w-12"></div>
-      <div className="bg-charcoal-800 h-12 w-12"></div>
-      <div className="bg-charcoal-800 h-12 flex-1"></div>
-    </div>
+    previewComponent: <FillRemainingSpacePreview />
   },
   {
     id: 'separate',
     name: 'Seperate',
     type: 'flexbox',
     description: 'Space items apart (like in navigation bars)',
-    previewComponent: <div className="flex justify-between w-full h-full items-center">
-      <div className="flex gap-1">
-        <div className="bg-charcoal-800 h-8 w-8"></div>
-        <div className="bg-charcoal-800 h-8 w-8"></div>
-      </div>
-      <div className="bg-charcoal-800 h-8 w-8"></div>
-    </div>
+    previewComponent: <SeparatePreview />
   },
 ];
