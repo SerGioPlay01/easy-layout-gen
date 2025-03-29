@@ -89,3 +89,77 @@ export const SeparatePreview: React.FC = () => (
     <div className="bg-charcoal-800 h-8 w-8"></div>
   </div>
 );
+
+// New layout previews
+export const CardGridPreview: React.FC = () => (
+  <div className="grid grid-cols-2 gap-2 w-full h-full">
+    {Array(4).fill(0).map((_, i) => (
+      <div key={i} className="bg-charcoal-800 rounded-md"></div>
+    ))}
+  </div>
+);
+
+export const MasonryPreview: React.FC = () => (
+  <div className="grid grid-cols-3 gap-1 w-full h-full">
+    <div className="bg-charcoal-800 h-10"></div>
+    <div className="bg-charcoal-800 h-16"></div>
+    <div className="bg-charcoal-800 h-12"></div>
+    <div className="bg-charcoal-800 h-14"></div>
+    <div className="bg-charcoal-800 h-8"></div>
+    <div className="bg-charcoal-800 h-10"></div>
+  </div>
+);
+
+export const CenteredContentPreview: React.FC = () => (
+  <div className="flex items-center justify-center w-full h-full">
+    <div className="bg-charcoal-800 h-16 w-16"></div>
+  </div>
+);
+
+export const FixedHeaderPreview: React.FC = () => (
+  <div className="flex flex-col w-full h-full">
+    <div className="bg-charcoal-800 h-8 w-full"></div>
+    <div className="bg-charcoal-100 flex-1 flex items-center justify-center">
+      <div className="bg-charcoal-800 h-8 w-24"></div>
+    </div>
+  </div>
+);
+
+export const TwoColumnPreview: React.FC = () => (
+  <div className="grid grid-cols-2 gap-2 w-full h-full">
+    <div className="bg-charcoal-800 h-full"></div>
+    <div className="bg-charcoal-800 h-full"></div>
+  </div>
+);
+
+export const TabsLayoutPreview: React.FC = () => (
+  <div className="flex flex-col w-full h-full">
+    <div className="flex">
+      <div className="bg-charcoal-800 h-6 w-12 mr-1"></div>
+      <div className="bg-charcoal-600 h-6 w-12 mr-1"></div>
+      <div className="bg-charcoal-600 h-6 w-12"></div>
+    </div>
+    <div className="bg-charcoal-800 flex-1 mt-1"></div>
+  </div>
+);
+
+export const ZStackPreview: React.FC = () => (
+  <div className="relative w-full h-full flex items-center justify-center">
+    <div className="absolute bg-charcoal-800 h-20 w-20 opacity-60 transform -translate-x-6 -translate-y-6"></div>
+    <div className="absolute bg-charcoal-800 h-20 w-20 opacity-80"></div>
+    <div className="absolute bg-charcoal-800 h-20 w-20 opacity-100 transform translate-x-6 translate-y-6"></div>
+  </div>
+);
+
+export const HierarchyPreview: React.FC = () => (
+  <div className="flex flex-col w-full h-full">
+    <div className="bg-charcoal-800 h-6 w-full mb-1"></div>
+    <div className="flex flex-1 gap-1">
+      <div className="bg-charcoal-800 w-1/4"></div>
+      <div className="flex flex-col flex-1 gap-1">
+        <div className="bg-charcoal-800 h-1/2"></div>
+        <div className="bg-charcoal-800 h-1/2"></div>
+      </div>
+    </div>
+  </div>
+);
