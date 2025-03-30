@@ -3,12 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import Header from '../components/Header';
-import TemplateSelector from '../components/TemplateSelector';
+import TemplateSelector, { TemplateCard } from '../components/TemplateSelector';
 import CodePreview from '../components/CodePreview';
 import LayoutPreview from '../components/LayoutPreview';
 import { getLayoutCode, layoutTemplates, LayoutTemplate, CSSLayout } from '../utils/layoutGenerators';
-import { useViewToggle } from '../contexts/ViewToggleContext';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Layout, SquareSplitVertical } from 'lucide-react';
 
@@ -21,8 +19,6 @@ const Index = () => {
     html: ''
   });
   const [templateType, setTemplateType] = useState<'grid' | 'modal'>('grid');
-  const { viewMode } = useViewToggle();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   
   // Effect to update layout code when template or options change
   useEffect(() => {
@@ -38,13 +34,8 @@ const Index = () => {
       toast.success(`${selectedTemplate.name} template selected`, {
         position: 'bottom-right',
       });
-
-      // Open dialog if in modal view
-      if (viewMode === 'modal') {
-        setIsDialogOpen(true);
-      }
     }
-  }, [selectedTemplate, layoutOptions, viewMode]);
+  }, [selectedTemplate, layoutOptions]);
   
   // Format the complete CSS code
   const formattedCSS = layoutCode.containerCSS + '\n\n' + layoutCode.childrenCSS;
@@ -60,6 +51,7 @@ const Index = () => {
   // Group templates by type
   const gridTemplates = layoutTemplates.filter(template => template.type === 'grid');
   const flexboxTemplates = layoutTemplates.filter(template => template.type === 'flexbox');
+  const modalTemplates = layoutTemplates.filter(template => template.type === 'modal');
 
   const PreviewContent = () => (
     <motion.div 
@@ -111,11 +103,11 @@ const Index = () => {
               <TabsList className="mb-6">
                 <TabsTrigger value="grid" className="flex items-center gap-2">
                   <Layout className="h-4 w-4" />
-                  Grid Layouts
+                  Grid & Flexbox Layouts
                 </TabsTrigger>
                 <TabsTrigger value="modal" className="flex items-center gap-2">
                   <SquareSplitVertical className="h-4 w-4" />
-                  Modal Layouts
+                  Modal/Dialog Layouts
                 </TabsTrigger>
               </TabsList>
               
@@ -124,7 +116,7 @@ const Index = () => {
                   <h3 className="text-xs uppercase tracking-wider text-charcoal-600 font-medium mb-3 ml-1">Grid</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {gridTemplates.map((template) => (
-                      <TemplateSelector.TemplateCard
+                      <TemplateCard
                         key={template.id}
                         template={template}
                         isSelected={false}
@@ -138,7 +130,7 @@ const Index = () => {
                   <h3 className="text-xs uppercase tracking-wider text-charcoal-600 font-medium mb-3 ml-1">Flexbox</h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {flexboxTemplates.map((template) => (
-                      <TemplateSelector.TemplateCard
+                      <TemplateCard
                         key={template.id}
                         template={template}
                         isSelected={false}
@@ -155,25 +147,27 @@ const Index = () => {
                     Dialog/Modal Templates
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {/* Here you would map modal templates when you have them */}
-                    <div className="rounded-xl border border-sand-200 p-6 flex items-center justify-center aspect-[4/3] bg-white text-center">
-                      <p className="text-charcoal-600">Modal templates will be added in the future</p>
-                    </div>
+                    {modalTemplates.length > 0 ? (
+                      modalTemplates.map((template) => (
+                        <TemplateCard
+                          key={template.id}
+                          template={template}
+                          isSelected={false}
+                          onSelect={() => handleSelectTemplate(template)}
+                        />
+                      ))
+                    ) : (
+                      <div className="rounded-xl border border-sand-200 p-6 flex items-center justify-center aspect-[4/3] bg-white text-center">
+                        <p className="text-charcoal-600">Modal templates will be added soon</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </TabsContent>
             </Tabs>
           </div>
         ) : (
-          viewMode === 'grid' ? (
-            <PreviewContent />
-          ) : (
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogContent className="max-w-4xl">
-                <PreviewContent />
-              </DialogContent>
-            </Dialog>
-          )
+          <PreviewContent />
         )}
       </main>
     </div>

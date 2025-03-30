@@ -25,7 +25,7 @@ export interface LayoutTemplate {
   name: string;
   previewComponent: JSX.Element;
   description: string;
-  type: 'grid' | 'flexbox';
+  type: 'grid' | 'flexbox' | 'modal';
 }
 
 export interface CSSLayout {
@@ -763,15 +763,814 @@ export const generateFlexboxLayout = (templateId: string, options: any = {}): CS
   }
 };
 
-export const getLayoutCode = (templateId: string, type: 'grid' | 'flexbox', options: any = {}): CSSLayout => {
-  if (type === 'grid') {
-    return generateGridLayout(templateId, options);
-  } else {
-    return generateFlexboxLayout(templateId, options);
+export const generateModalLayout = (templateId: string, options: any = {}): CSSLayout => {
+  switch (templateId) {
+    case 'basic-modal':
+      return {
+        containerCSS: `
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-overlay.active {
+  display: flex;
+}`,
+        childrenCSS: `
+.modal-container {
+  background-color: white;
+  padding: ${options.padding || '2rem'};
+  border-radius: ${options.borderRadius || '0.5rem'};
+  max-width: ${options.maxWidth || '500px'};
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1A1F2C;
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #8A898C;
+}
+
+.modal-body {
+  margin-bottom: 1.5rem;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.modal-button {
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.modal-button-primary {
+  background-color: #9b87f5;
+  color: white;
+  border: none;
+}
+
+.modal-button-secondary {
+  background-color: transparent;
+  border: 1px solid #C8C8C9;
+  color: #403E43;
+}`,
+        html: `
+<button id="openModalBtn" onclick="document.getElementById('modalOverlay').classList.add('active')">
+  Open Modal
+</button>
+
+<div id="modalOverlay" class="modal-overlay">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h3 class="modal-title">Basic Modal</h3>
+      <button class="modal-close" onclick="document.getElementById('modalOverlay').classList.remove('active')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p>This is a basic modal dialog. You can add any content here.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-button modal-button-secondary" onclick="document.getElementById('modalOverlay').classList.remove('active')">Cancel</button>
+      <button class="modal-button modal-button-primary">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Close modal when clicking outside of it
+  document.getElementById('modalOverlay').addEventListener('click', function(event) {
+    if (event.target === this) {
+      this.classList.remove('active');
+    }
+  });
+</script>`
+      };
+      
+    case 'notification-modal':
+      return {
+        containerCSS: `
+.notification-modal {
+  position: fixed;
+  top: ${options.position === 'top' ? '1rem' : 'auto'};
+  bottom: ${options.position === 'bottom' ? '1rem' : 'auto'};
+  right: ${options.position === 'left' ? 'auto' : '1rem'};
+  left: ${options.position === 'left' ? '1rem' : 'auto'};
+  max-width: ${options.maxWidth || '400px'};
+  width: calc(100% - 2rem);
+  z-index: 1000;
+  transform: translateY(${options.position === 'top' ? '-150%' : '150%'});
+  transition: transform 0.3s ease-in-out;
+}
+
+.notification-modal.show {
+  transform: translateY(0);
+}`,
+        childrenCSS: `
+.notification-content {
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.notification-icon {
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  color: white;
+}
+
+.notification-icon.success {
+  background-color: #10B981;
+}
+
+.notification-icon.error {
+  background-color: #EF4444;
+}
+
+.notification-icon.warning {
+  background-color: #F59E0B;
+}
+
+.notification-icon.info {
+  background-color: #3B82F6;
+}
+
+.notification-body {
+  flex: 1;
+}
+
+.notification-title {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  color: #1A1F2C;
+}
+
+.notification-message {
+  font-size: 0.875rem;
+  color: #6B7280;
+}
+
+.notification-close {
+  background: transparent;
+  border: none;
+  color: #9CA3AF;
+  cursor: pointer;
+  padding: 0.25rem;
+}`,
+        html: `
+<button id="showNotification" class="modal-button modal-button-primary">Show Notification</button>
+
+<div id="notification" class="notification-modal">
+  <div class="notification-content">
+    <div class="notification-icon success">✓</div>
+    <div class="notification-body">
+      <h4 class="notification-title">Success</h4>
+      <p class="notification-message">Your changes have been saved successfully.</p>
+    </div>
+    <button class="notification-close" onclick="hideNotification()">✕</button>
+  </div>
+</div>
+
+<script>
+  function showNotification() {
+    const notification = document.getElementById('notification');
+    notification.classList.add('show');
+    
+    // Automatically hide after 5 seconds
+    setTimeout(hideNotification, 5000);
+  }
+  
+  function hideNotification() {
+    const notification = document.getElementById('notification');
+    notification.classList.remove('show');
+  }
+  
+  document.getElementById('showNotification').addEventListener('click', showNotification);
+</script>`
+      };
+      
+    case 'confirmation-modal':
+      return {
+        containerCSS: `
+.confirmation-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.confirmation-overlay.active {
+  display: flex;
+}`,
+        childrenCSS: `
+.confirmation-modal {
+  background-color: white;
+  border-radius: 0.5rem;
+  width: 100%;
+  max-width: 400px;
+  overflow: hidden;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.confirmation-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 2rem 0;
+  background-color: ${options.iconBgColor || '#FEF2F2'};
+}
+
+.confirmation-icon svg {
+  height: 4rem;
+  width: 4rem;
+  color: ${options.iconColor || '#DC2626'};
+}
+
+.confirmation-content {
+  padding: 1.5rem;
+}
+
+.confirmation-title {
+  color: #1F2937;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.confirmation-message {
+  color: #6B7280;
+  margin-bottom: 1.5rem;
+}
+
+.confirmation-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.btn-cancel {
+  background-color: white;
+  border: 1px solid #E5E7EB;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+}
+
+.btn-confirm {
+  background-color: #DC2626;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  cursor: pointer;
+}`,
+        html: `
+<button id="openConfirmModal" class="modal-button modal-button-secondary">Delete Item</button>
+
+<div id="confirmOverlay" class="confirmation-overlay">
+  <div class="confirmation-modal">
+    <div class="confirmation-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+      </svg>
+    </div>
+    <div class="confirmation-content">
+      <h3 class="confirmation-title">Delete Item</h3>
+      <p class="confirmation-message">Are you sure you want to delete this item? This action cannot be undone.</p>
+      <div class="confirmation-actions">
+        <button class="btn-cancel" onclick="closeConfirmModal()">Cancel</button>
+        <button class="btn-confirm" onclick="deleteItem()">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openConfirmModal() {
+    document.getElementById('confirmOverlay').classList.add('active');
+  }
+  
+  function closeConfirmModal() {
+    document.getElementById('confirmOverlay').classList.remove('active');
+  }
+  
+  function deleteItem() {
+    // Perform delete action here
+    alert('Item deleted!');
+    closeConfirmModal();
+  }
+  
+  document.getElementById('openConfirmModal').addEventListener('click', openConfirmModal);
+  
+  // Close when clicking outside
+  document.getElementById('confirmOverlay').addEventListener('click', function(event) {
+    if (event.target === this) {
+      closeConfirmModal();
+    }
+  });
+</script>`
+      };
+      
+    case 'fullscreen-modal':
+      return {
+        containerCSS: `
+.fullscreen-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: ${options.bgColor || 'white'};
+  z-index: 1000;
+  display: none;
+  flex-direction: column;
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+.fullscreen-modal.active {
+  display: flex;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}`,
+        childrenCSS: `
+.fullscreen-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.fullscreen-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.fullscreen-close {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  color: #6B7280;
+}
+
+.fullscreen-close:hover {
+  background-color: #F3F4F6;
+}
+
+.fullscreen-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2rem;
+}
+
+.fullscreen-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #E5E7EB;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.fullscreen-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.fullscreen-btn-primary {
+  background-color: #2563EB;
+  color: white;
+  border: none;
+}
+
+.fullscreen-btn-secondary {
+  background-color: white;
+  border: 1px solid #D1D5DB;
+  color: #374151;
+}`,
+        html: `
+<button id="openFullscreenModal" class="modal-button modal-button-primary">Open Fullscreen Modal</button>
+
+<div id="fullscreenModal" class="fullscreen-modal">
+  <div class="fullscreen-header">
+    <h2 class="fullscreen-title">Fullscreen Modal</h2>
+    <button class="fullscreen-close" onclick="closeFullscreenModal()">×</button>
+  </div>
+  
+  <div class="fullscreen-body">
+    <h3>Main Content</h3>
+    <p>This is a fullscreen modal that takes up the entire viewport.</p>
+    <p>It's perfect for complex forms, detailed views, or any content that needs more space.</p>
+    
+    <!-- Add more content here -->
+    <div style="height: 1000px; padding-top: 20px;">
+      <p>Scroll down to see more content...</p>
+      <p>Notice that the header and footer stay fixed while this content scrolls.</p>
+    </div>
+  </div>
+  
+  <div class="fullscreen-footer">
+    <button class="fullscreen-btn fullscreen-btn-secondary" onclick="closeFullscreenModal()">Cancel</button>
+    <button class="fullscreen-btn fullscreen-btn-primary">Save Changes</button>
+  </div>
+</div>
+
+<script>
+  function openFullscreenModal() {
+    document.getElementById('fullscreenModal').classList.add('active');
+    // Prevent body scrolling when modal is open
+    document.body.style.overflow = 'hidden';
+  }
+  
+  function closeFullscreenModal() {
+    document.getElementById('fullscreenModal').classList.remove('active');
+    // Restore body scrolling
+    document.body.style.overflow = 'auto';
+  }
+  
+  document.getElementById('openFullscreenModal').addEventListener('click', openFullscreenModal);
+</script>`
+      };
+      
+    case 'drawer-modal':
+      return {
+        containerCSS: `
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.drawer-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  ${options.position === 'left' ? 'left: 0; transform: translateX(-100%);' : 'right: 0; transform: translateX(100%);'}
+  width: ${options.width || '300px'};
+  max-width: 90vw;
+  height: 100%;
+  background-color: white;
+  box-shadow: ${options.position === 'left' ? '2px 0 5px rgba(0, 0, 0, 0.1)' : '-2px 0 5px rgba(0, 0, 0, 0.1)'};
+  z-index: 1001;
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.drawer-overlay.active .drawer {
+  transform: translateX(0);
+}`,
+        childrenCSS: `
+.drawer-header {
+  padding: 1rem;
+  border-bottom: 1px solid #E5E7EB;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.drawer-title {
+  font-weight: 600;
+  font-size: 1.125rem;
+  color: #111827;
+}
+
+.drawer-close {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1.25rem;
+  color: #6B7280;
+}
+
+.drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.drawer-footer {
+  padding: 1rem;
+  border-top: 1px solid #E5E7EB;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.drawer-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.drawer-btn-primary {
+  background-color: #4F46E5;
+  color: white;
+  border: none;
+}
+
+.drawer-btn-secondary {
+  background-color: white;
+  border: 1px solid #D1D5DB;
+  color: #374151;
+}`,
+        html: `
+<button id="openDrawer" class="modal-button modal-button-primary">Open Drawer</button>
+
+<div id="drawerOverlay" class="drawer-overlay">
+  <div class="drawer">
+    <div class="drawer-header">
+      <h3 class="drawer-title">Drawer Menu</h3>
+      <button class="drawer-close" onclick="closeDrawer()">×</button>
+    </div>
+    <div class="drawer-body">
+      <nav>
+        <ul style="list-style: none; padding: 0; margin: 0;">
+          <li style="padding: 0.75rem 0; border-bottom: 1px solid #E5E7EB;">
+            <a href="#" style="text-decoration: none; color: #374151;">Home</a>
+          </li>
+          <li style="padding: 0.75rem 0; border-bottom: 1px solid #E5E7EB;">
+            <a href="#" style="text-decoration: none; color: #374151;">Products</a>
+          </li>
+          <li style="padding: 0.75rem 0; border-bottom: 1px solid #E5E7EB;">
+            <a href="#" style="text-decoration: none; color: #374151;">Services</a>
+          </li>
+          <li style="padding: 0.75rem 0; border-bottom: 1px solid #E5E7EB;">
+            <a href="#" style="text-decoration: none; color: #374151;">About</a>
+          </li>
+          <li style="padding: 0.75rem 0;">
+            <a href="#" style="text-decoration: none; color: #374151;">Contact</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+    <div class="drawer-footer">
+      <button class="drawer-btn drawer-btn-secondary" onclick="closeDrawer()">Close</button>
+      <button class="drawer-btn drawer-btn-primary">Apply</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openDrawer() {
+    document.getElementById('drawerOverlay').classList.add('active');
+    // Prevent body scrolling
+    document.body.style.overflow = 'hidden';
+  }
+  
+  function closeDrawer() {
+    document.getElementById('drawerOverlay').classList.remove('active');
+    // Restore body scrolling
+    document.body.style.overflow = 'auto';
+  }
+  
+  document.getElementById('openDrawer').addEventListener('click', openDrawer);
+  
+  // Close when clicking on overlay
+  document.getElementById('drawerOverlay').addEventListener('click', function(event) {
+    if (event.target === this) {
+      closeDrawer();
+    }
+  });
+</script>`
+      };
+      
+    default:
+      return {
+        containerCSS: '',
+        childrenCSS: '',
+        html: ''
+      };
   }
 };
 
-// Template data
+export const getLayoutCode = (templateId: string, type: 'grid' | 'flexbox' | 'modal', options: any = {}): CSSLayout => {
+  if (type === 'grid') {
+    return generateGridLayout(templateId, options);
+  } else if (type === 'flexbox') {
+    return generateFlexboxLayout(templateId, options);
+  } else if (type === 'modal') {
+    return generateModalLayout(templateId, options);
+  }
+  
+  return {
+    containerCSS: '',
+    childrenCSS: '',
+    html: ''
+  };
+};
+
+const BasicModalPreview = () => (
+  <div className="w-full h-full bg-white rounded-md overflow-hidden">
+    <div className="flex flex-col h-full border border-gray-200 rounded-md">
+      <div className="w-full h-5 bg-gray-100 border-b border-gray-200 flex items-center justify-end px-1.5">
+        <div className="w-2 h-2 rounded-full bg-gray-300 mr-1"></div>
+      </div>
+      <div className="flex-1 p-2 flex flex-col items-center justify-center relative">
+        <div className="absolute inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white w-3/4 h-1/2 rounded shadow-sm flex p-1.5">
+            <div className="w-4 h-4 rounded-full bg-green-500 mr-2 flex-shrink-0"></div>
+            <div className="flex-1">
+              <div className="w-12 h-1.5 bg-gray-700 rounded-sm mb-1"></div>
+              <div className="w-20 h-1 bg-gray-300 rounded-sm"></div>
+            </div>
+            <div className="w-2 h-2 bg-gray-300 rounded-full ml-2"></div>
+          </div>
+        </div>
+        <div className="h-2 w-12 bg-gray-300 rounded-md"></div>
+        <div className="h-2 w-16 bg-gray-200 rounded-md mt-1.5"></div>
+        <div className="h-2 w-14 bg-gray-200 rounded-md mt-1"></div>
+      </div>
+    </div>
+  </div>
+);
+
+const NotificationModalPreview = () => (
+  <div className="w-full h-full bg-white rounded-md overflow-hidden">
+    <div className="flex flex-col h-full border border-gray-200 rounded-md">
+      <div className="w-full h-5 bg-gray-100 border-b border-gray-200 flex items-center justify-end px-1.5">
+        <div className="w-2 h-2 rounded-full bg-gray-300 mr-1"></div>
+      </div>
+      <div className="flex-1 p-2 flex flex-col items-center justify-center relative">
+        <div className="absolute top-4 right-4 bg-white w-3/4 rounded border border-gray-200 shadow-sm flex p-1.5">
+          <div className="w-4 h-4 rounded-full bg-green-500 mr-2 flex-shrink-0"></div>
+          <div className="flex-1">
+            <div className="w-12 h-1.5 bg-gray-700 rounded-sm mb-1"></div>
+            <div className="w-20 h-1 bg-gray-300 rounded-sm"></div>
+          </div>
+          <div className="w-2 h-2 bg-gray-300 rounded-full ml-2"></div>
+        </div>
+        <div className="h-2 w-12 bg-gray-300 rounded-md"></div>
+        <div className="h-2 w-16 bg-gray-200 rounded-md mt-1.5"></div>
+        <div className="h-2 w-14 bg-gray-200 rounded-md mt-1"></div>
+      </div>
+    </div>
+  </div>
+);
+
+const ConfirmationModalPreview = () => (
+  <div className="w-full h-full bg-white rounded-md overflow-hidden">
+    <div className="flex flex-col h-full border border-gray-200 rounded-md">
+      <div className="w-full h-5 bg-gray-100 border-b border-gray-200 flex items-center justify-end px-1.5">
+        <div className="w-2 h-2 rounded-full bg-gray-300 mr-1"></div>
+      </div>
+      <div className="flex-1 p-2 flex flex-col items-center justify-center relative">
+        <div className="absolute inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white w-3/4 rounded shadow-sm flex flex-col overflow-hidden">
+            <div className="bg-red-100 h-1/3 flex items-center justify-center">
+              <div className="w-5 h-5 rounded-full bg-red-500"></div>
+            </div>
+            <div className="p-1.5">
+              <div className="w-12 h-1.5 bg-gray-700 rounded-sm mb-1"></div>
+              <div className="w-20 h-1 bg-gray-300 rounded-sm mb-2"></div>
+              <div className="flex justify-end gap-1">
+                <div className="w-6 h-2 bg-gray-200 rounded-sm"></div>
+                <div className="w-6 h-2 bg-red-500 rounded-sm"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="h-2 w-12 bg-gray-300 rounded-md"></div>
+        <div className="h-2 w-16 bg-gray-200 rounded-md mt-1.5"></div>
+        <div className="h-2 w-14 bg-gray-200 rounded-md mt-1"></div>
+      </div>
+    </div>
+  </div>
+);
+
+const FullscreenModalPreview = () => (
+  <div className="w-full h-full bg-white rounded-md overflow-hidden">
+    <div className="flex flex-col h-full border border-gray-200 rounded-md">
+      <div className="w-full h-5 bg-gray-100 border-b border-gray-200 flex items-center justify-end px-1.5">
+        <div className="w-2 h-2 rounded-full bg-gray-300 mr-1"></div>
+      </div>
+      <div className="flex-1 flex flex-col">
+        <div className="h-6 border-b border-gray-200 flex items-center justify-between px-2">
+          <div className="w-12 h-1.5 bg-gray-700 rounded-sm"></div>
+          <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+        </div>
+        <div className="flex-1 p-2">
+          <div className="w-full h-2 bg-gray-200 rounded-md mb-1.5"></div>
+          <div className="w-3/4 h-2 bg-gray-200 rounded-md"></div>
+        </div>
+        <div className="h-6 border-t border-gray-200 flex items-center justify-end px-2 gap-1.5">
+          <div className="w-6 h-2 bg-gray-300 rounded-sm"></div>
+          <div className="w-6 h-2 bg-blue-500 rounded-sm"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+const DrawerModalPreview = () => (
+  <div className="w-full h-full bg-white rounded-md overflow-hidden">
+    <div className="flex flex-col h-full border border-gray-200 rounded-md">
+      <div className="w-full h-5 bg-gray-100 border-b border-gray-200 flex items-center justify-end px-1.5">
+        <div className="w-2 h-2 rounded-full bg-gray-300 mr-1"></div>
+      </div>
+      <div className="flex-1 p-2 flex flex-col items-center justify-center relative">
+        <div className="absolute inset-0 bg-gray-800 bg-opacity-50 flex">
+          <div className="bg-white w-1/3 h-full flex flex-col">
+            <div className="h-6 border-b border-gray-200 flex items-center justify-between px-1.5">
+              <div className="w-10 h-1.5 bg-gray-700 rounded-sm"></div>
+              <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
+            </div>
+            <div className="flex-1 p-1.5">
+              <div className="w-full h-2 bg-gray-200 rounded-md mb-1.5"></div>
+              <div className="w-full h-2 bg-gray-200 rounded-md mb-1.5"></div>
+              <div className="w-full h-2 bg-gray-200 rounded-md"></div>
+            </div>
+            <div className="h-6 border-t border-gray-200 flex items-center justify-end px-1.5 gap-1">
+              <div className="w-6 h-2 bg-gray-300 rounded-sm"></div>
+              <div className="w-6 h-2 bg-indigo-500 rounded-sm"></div>
+            </div>
+          </div>
+          <div className="flex-1"></div>
+        </div>
+        <div className="h-2 w-12 bg-gray-300 rounded-md"></div>
+        <div className="h-2 w-16 bg-gray-200 rounded-md mt-1.5"></div>
+        <div className="h-2 w-14 bg-gray-200 rounded-md mt-1"></div>
+      </div>
+    </div>
+  </div>
+);
+
 export const layoutTemplates: LayoutTemplate[] = [
   // Grid layouts
   {
@@ -901,5 +1700,42 @@ export const layoutTemplates: LayoutTemplate[] = [
     type: 'flexbox',
     description: 'Layered elements with z-index positioning',
     previewComponent: <ZStackPreview />
+  },
+  
+  // Modal layouts
+  {
+    id: 'basic-modal',
+    name: 'Basic Modal',
+    type: 'modal',
+    description: 'Standard dialog with header, body and footer',
+    previewComponent: <BasicModalPreview />
+  },
+  {
+    id: 'notification-modal',
+    name: 'Notification',
+    type: 'modal',
+    description: 'Toast/notification popup for alerts and notices',
+    previewComponent: <NotificationModalPreview />
+  },
+  {
+    id: 'confirmation-modal',
+    name: 'Confirmation Dialog',
+    type: 'modal',
+    description: 'Dialog for confirming destructive actions',
+    previewComponent: <ConfirmationModalPreview />
+  },
+  {
+    id: 'fullscreen-modal',
+    name: 'Fullscreen Modal',
+    type: 'modal',
+    description: 'Modal that takes the entire screen',
+    previewComponent: <FullscreenModalPreview />
+  },
+  {
+    id: 'drawer-modal',
+    name: 'Drawer/Sidebar',
+    type: 'modal',
+    description: 'Side drawer that slides from the edge',
+    previewComponent: <DrawerModalPreview />
   },
 ];

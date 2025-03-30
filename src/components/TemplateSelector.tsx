@@ -8,13 +8,13 @@ interface TemplateSelectorProps {
   onSelectTemplate: (template: LayoutTemplate) => void;
 }
 
-interface TemplateCardProps {
+export interface TemplateCardProps {
   template: LayoutTemplate;
   isSelected: boolean;
   onSelect: () => void;
 }
 
-const TemplateCard: React.FC<TemplateCardProps> = ({ template, isSelected, onSelect }) => {
+export const TemplateCard: React.FC<TemplateCardProps> = ({ template, isSelected, onSelect }) => {
   return (
     <motion.button
       whileHover={{ y: -4 }}
@@ -47,6 +47,7 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
   // Group templates by type
   const gridTemplates = layoutTemplates.filter(template => template.type === 'grid');
   const flexboxTemplates = layoutTemplates.filter(template => template.type === 'flexbox');
+  const modalTemplates = layoutTemplates.filter(template => template.type === 'modal');
 
   return (
     <div className="py-6 px-6 animate-fade-in">
@@ -68,7 +69,7 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
       </div>
       
       {/* Flexbox Templates */}
-      <div>
+      <div className="mb-8">
         <h3 className="text-xs uppercase tracking-wider text-charcoal-600 font-medium mb-3 ml-1">Flexbox</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {flexboxTemplates.map((template) => (
@@ -81,11 +82,23 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
           ))}
         </div>
       </div>
+      
+      {/* Modal Templates */}
+      <div className="mb-8">
+        <h3 className="text-xs uppercase tracking-wider text-charcoal-600 font-medium mb-3 ml-1">Modal/Dialog</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {modalTemplates.map((template) => (
+            <TemplateCard
+              key={template.id}
+              template={template}
+              isSelected={selectedTemplate?.id === template.id}
+              onSelect={() => onSelectTemplate(template)}
+            />
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
-
-// Export the component and also expose the TemplateCard
-TemplateSelector.TemplateCard = TemplateCard;
 
 export default TemplateSelector;
