@@ -9,6 +9,8 @@ import LayoutPreview from '../components/LayoutPreview';
 import { getLayoutCode, layoutTemplates, LayoutTemplate, CSSLayout } from '../utils/layoutGenerators';
 import { useViewToggle } from '../contexts/ViewToggleContext';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Layout, SquareSplitVertical } from 'lucide-react';
 
 const Index = () => {
   const [selectedTemplate, setSelectedTemplate] = useState<LayoutTemplate | null>(null);
@@ -18,6 +20,7 @@ const Index = () => {
     childrenCSS: '',
     html: ''
   });
+  const [templateType, setTemplateType] = useState<'grid' | 'modal'>('grid');
   const { viewMode } = useViewToggle();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   
@@ -53,6 +56,10 @@ const Index = () => {
     // Reset options when template changes
     setLayoutOptions({});
   };
+
+  // Group templates by type
+  const gridTemplates = layoutTemplates.filter(template => template.type === 'grid');
+  const flexboxTemplates = layoutTemplates.filter(template => template.type === 'flexbox');
 
   const PreviewContent = () => (
     <motion.div 
@@ -97,10 +104,66 @@ const Index = () => {
       
       <main className="flex-1">
         {!selectedTemplate ? (
-          <TemplateSelector 
-            selectedTemplate={selectedTemplate}
-            onSelectTemplate={handleSelectTemplate}
-          />
+          <div className="py-6 px-6 animate-fade-in">
+            <h2 className="text-2xl font-medium mb-6 text-charcoal-950">Select a Template</h2>
+            
+            <Tabs defaultValue="grid" className="w-full" onValueChange={(value) => setTemplateType(value as 'grid' | 'modal')}>
+              <TabsList className="mb-6">
+                <TabsTrigger value="grid" className="flex items-center gap-2">
+                  <Layout className="h-4 w-4" />
+                  Grid Layouts
+                </TabsTrigger>
+                <TabsTrigger value="modal" className="flex items-center gap-2">
+                  <SquareSplitVertical className="h-4 w-4" />
+                  Modal Layouts
+                </TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="grid" className="mt-0">
+                <div className="mb-8">
+                  <h3 className="text-xs uppercase tracking-wider text-charcoal-600 font-medium mb-3 ml-1">Grid</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {gridTemplates.map((template) => (
+                      <TemplateSelector.TemplateCard
+                        key={template.id}
+                        template={template}
+                        isSelected={false}
+                        onSelect={() => handleSelectTemplate(template)}
+                      />
+                    ))}
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="text-xs uppercase tracking-wider text-charcoal-600 font-medium mb-3 ml-1">Flexbox</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {flexboxTemplates.map((template) => (
+                      <TemplateSelector.TemplateCard
+                        key={template.id}
+                        template={template}
+                        isSelected={false}
+                        onSelect={() => handleSelectTemplate(template)}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="modal" className="mt-0">
+                <div className="mb-8">
+                  <h3 className="text-xs uppercase tracking-wider text-charcoal-600 font-medium mb-3 ml-1">
+                    Dialog/Modal Templates
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {/* Here you would map modal templates when you have them */}
+                    <div className="rounded-xl border border-sand-200 p-6 flex items-center justify-center aspect-[4/3] bg-white text-center">
+                      <p className="text-charcoal-600">Modal templates will be added in the future</p>
+                    </div>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
         ) : (
           viewMode === 'grid' ? (
             <PreviewContent />

@@ -8,6 +8,38 @@ interface TemplateSelectorProps {
   onSelectTemplate: (template: LayoutTemplate) => void;
 }
 
+interface TemplateCardProps {
+  template: LayoutTemplate;
+  isSelected: boolean;
+  onSelect: () => void;
+}
+
+const TemplateCard: React.FC<TemplateCardProps> = ({ template, isSelected, onSelect }) => {
+  return (
+    <motion.button
+      whileHover={{ y: -4 }}
+      whileTap={{ scale: 0.98 }}
+      onClick={onSelect}
+      className={`
+        rounded-xl overflow-hidden border transition-all-200 bg-white
+        ${isSelected 
+          ? 'border-charcoal-950 shadow-md ring-2 ring-charcoal-950 ring-opacity-20' 
+          : 'border-sand-200 hover:border-sand-300 shadow-subtle hover:shadow'}
+      `}
+    >
+      <div className="aspect-[4/3] w-full p-4 flex items-center justify-center">
+        <div className="w-full h-full">
+          {template.previewComponent}
+        </div>
+      </div>
+      <div className="px-4 py-3 border-t border-sand-200 text-left">
+        <h3 className="font-medium text-charcoal-950">{template.name}</h3>
+        <p className="text-xs text-charcoal-600 mt-1">{template.description}</p>
+      </div>
+    </motion.button>
+  );
+};
+
 const TemplateSelector: React.FC<TemplateSelectorProps> = ({ 
   selectedTemplate, 
   onSelectTemplate 
@@ -53,36 +85,7 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
   );
 };
 
-interface TemplateCardProps {
-  template: LayoutTemplate;
-  isSelected: boolean;
-  onSelect: () => void;
-}
-
-const TemplateCard: React.FC<TemplateCardProps> = ({ template, isSelected, onSelect }) => {
-  return (
-    <motion.button
-      whileHover={{ y: -4 }}
-      whileTap={{ scale: 0.98 }}
-      onClick={onSelect}
-      className={`
-        rounded-xl overflow-hidden border transition-all-200 bg-white
-        ${isSelected 
-          ? 'border-charcoal-950 shadow-md ring-2 ring-charcoal-950 ring-opacity-20' 
-          : 'border-sand-200 hover:border-sand-300 shadow-subtle hover:shadow'}
-      `}
-    >
-      <div className="aspect-[4/3] w-full p-4 flex items-center justify-center">
-        <div className="w-full h-full">
-          {template.previewComponent}
-        </div>
-      </div>
-      <div className="px-4 py-3 border-t border-sand-200 text-left">
-        <h3 className="font-medium text-charcoal-950">{template.name}</h3>
-        <p className="text-xs text-charcoal-600 mt-1">{template.description}</p>
-      </div>
-    </motion.button>
-  );
-};
+// Export the component and also expose the TemplateCard
+TemplateSelector.TemplateCard = TemplateCard;
 
 export default TemplateSelector;
